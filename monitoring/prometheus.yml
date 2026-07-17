@@ -1,0 +1,8 @@
+global:
+  scrape_interval: 5s
+
+scrape_configs:
+  - job_name: "policy-server"
+    static_configs:
+      - targets: ["policy-server:8000"]
+    metrics_path: /metrics

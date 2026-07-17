@@ -1,0 +1,17 @@
+{
+  "clean": {
+    "success_rate": 1.0,
+    "latency_p50_ms": 0.026291003450751305,
+    "latency_p95_ms": 0.026749999960884452
+  },
+  "noisy_obs_low": {
+    "success_rate": 0.995,
+    "latency_p50_ms": 0.025709014153108,
+    "latency_p95_ms": 0.026833993615582585
+  },
+  "noisy_obs_high": {
+    "success_rate": 0.7,
+    "latency_p50_ms": 0.025874993298202753,
+    "latency_p95_ms": 0.027165981009602547
+  }
+}

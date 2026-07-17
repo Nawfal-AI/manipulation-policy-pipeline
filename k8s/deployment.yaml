@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: policy-server
+  labels:
+    app: policy-server
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: policy-server
+  template:
+    metadata:
+      labels:
+        app: policy-server
+    spec:
+      containers:
+        - name: policy-server
+          image: policy-server:latest
+          imagePullPolicy: IfNotPresent  # for local minikube/k3d; use Always once pushed to a real registry
+          ports:
+            - containerPort: 8000
+          env:
+            - name: CHECKPOINT_PATH
+              value: /app/checkpoints/bc_policy.pt
+          # Model weights are NOT baked into the image (see Dockerfile) — in a
+          # real cluster these would come from a PersistentVolumeClaim or an
+          # initContainer that pulls the checkpoint from object storage/HF Hub
+          # before the main container starts. For local minikube/k3d testing,
+          # a hostPath volume pointing at ./checkpoints works:
+          # volumeMounts:
+          #   - name: checkpoints
+          #     mountPath: /app/checkpoints
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "1"
+              memory: "1Gi"
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 15
+            periodSeconds: 20
