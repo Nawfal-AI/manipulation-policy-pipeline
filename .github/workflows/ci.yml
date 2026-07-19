@@ -37,11 +37,16 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Compute lowercase image name
+        # Docker/OCI image references must be entirely lowercase.
+        # github.repository ("Nawfal-AI/manipulation-policy-pipeline")
+        # contains uppercase letters, which fails tag validation immediately.
+        run: echo "IMAGE_NAME=$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_ENV"
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
           context: .
           push: true
           tags: |
-            ghcr.io/${{ github.repository }}/policy-server:latest
-            ghcr.io/${{ github.repository }}/policy-server:${{ github.sha }}
+            ghcr.io/${{ env.IMAGE_NAME }}/policy-server:latest
+            ghcr.io/${{ env.IMAGE_NAME }}/policy-server:${{ github.sha }}
