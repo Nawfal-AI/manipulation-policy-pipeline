@@ -1,0 +1,134 @@
+---
+# Ansible playbook — deploy the full manipulation-policy-pipeline stack
+# to a fresh Ubuntu 22.04 server (or local Docker test container).
+#
+# What it does:
+#   1. Installs Docker + Docker Compose on the target machine
+#   2. Copies the project files to /opt/manipulation-policy-pipeline
+#   3. Starts all services: policy-server, Prometheus, Grafana, MLflow
+#
+# Usage:
+#   # Against a real remote server:
+#   ansible-playbook ansible/playbook.yml -i ansible/inventory.ini
+#
+#   # Local test with Docker (see ansible/README.md for setup):
+#   ansible-playbook ansible/playbook.yml -i ansible/inventory_local.ini
+#
+# Requirements on control machine (your MacBook):
+#   pip install ansible
+
+- name: Deploy manipulation-policy-pipeline
+  hosts: ml_servers
+  become: true   # sudo
+
+  vars:
+    app_dir: /opt/manipulation-policy-pipeline
+    compose_file: "{{ app_dir }}/docker-compose.yml"
+    mlflow_port: 5000
+    api_port: 8000
+    grafana_port: 3000
+    prometheus_port: 9090
+
+  tasks:
+    # ── 1. System packages ────────────────────────────────────────────────
+    - name: Update apt cache
+      apt:
+        update_cache: true
+        cache_valid_time: 3600
+
+    - name: Install prerequisites
+      apt:
+        name:
+          - ca-certificates
+          - curl
+          - gnupg
+          - lsb-release
+          - python3-pip
+        state: present
+
+    # ── 2. Install Docker ─────────────────────────────────────────────────
+    - name: Add Docker GPG key
+      ansible.builtin.get_url:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        dest: /etc/apt/keyrings/docker.asc
+        mode: "0644"
+
+    - name: Add Docker apt repository
+      ansible.builtin.apt_repository:
+        repo: >-
+          deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.asc]
+          https://download.docker.com/linux/ubuntu
+          {{ ansible_distribution_release }} stable
+        filename: docker
+
+    - name: Install Docker Engine and Compose plugin
+      apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-compose-plugin
+        state: present
+        update_cache: true
+
+    - name: Enable and start Docker service
+      systemd:
+        name: docker
+        enabled: true
+        state: started
+
+    # ── 3. Copy project files ─────────────────────────────────────────────
+    - name: Create application directory
+      file:
+        path: "{{ app_dir }}"
+        state: directory
+        mode: "0755"
+
+    - name: Copy docker-compose.yml
+      copy:
+        src: ../docker-compose.yml
+        dest: "{{ compose_file }}"
+        mode: "0644"
+
+    - name: Copy monitoring config
+      copy:
+        src: ../monitoring/
+        dest: "{{ app_dir }}/monitoring/"
+        mode: "0644"
+
+    - name: Copy checkpoints directory
+      copy:
+        src: ../checkpoints/
+        dest: "{{ app_dir }}/checkpoints/"
+        mode: "0644"
+
+    # ── 4. Start services ─────────────────────────────────────────────────
+    - name: Pull latest images
+      community.docker.docker_compose_v2:
+        project_src: "{{ app_dir }}"
+        pull: always
+      ignore_errors: true   # graceful if no internet on target
+
+    - name: Start all services with Docker Compose
+      community.docker.docker_compose_v2:
+        project_src: "{{ app_dir }}"
+        state: present
+
+    # ── 5. Health checks ──────────────────────────────────────────────────
+    - name: Wait for policy server to be healthy
+      ansible.builtin.uri:
+        url: "http://localhost:{{ api_port }}/health"
+        status_code: 200
+      register: health_result
+      retries: 10
+      delay: 5
+      until: health_result.status == 200
+
+    - name: Print deployment summary
+      debug:
+        msg:
+          - "✅ Deployment complete"
+          - "  Policy API  : http://{{ ansible_host }}:{{ api_port }}/docs"
+          - "  Prometheus  : http://{{ ansible_host }}:{{ prometheus_port }}"
+          - "  Grafana     : http://{{ ansible_host }}:{{ grafana_port }} (admin/admin)"
+          - "  MLflow UI   : http://{{ ansible_host }}:{{ mlflow_port }}"

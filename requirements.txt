@@ -6,3 +6,12 @@ pydantic>=2.6.0
 prometheus-client>=0.20.0
 requests>=2.31.0
 pytest>=8.0.0
+# MLflow — experiment tracking + model registry
+mlflow>=2.13.0
+# Evidently — data drift monitoring
+evidently>=0.4.30
+# ONNX — inference optimization (Project 1)
+onnx>=1.16.0
+onnxruntime>=1.18.0
+# Pandas required by Evidently
+pandas>=2.0.0

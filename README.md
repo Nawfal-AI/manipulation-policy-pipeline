@@ -1,101 +1,144 @@
 # 🤖 manipulation-policy-pipeline
 
-> **Imitation-learning policy (BC + Diffusion Policy) with a full production deployment pipeline**
+**An end-to-end ML platform for robotics policy learning** — covering experiment tracking (MLflow), GPU inference optimisation (FP16 · torch.compile · ONNX), containerised serving (FastAPI + Docker), orchestration (Kubernetes), data drift monitoring (Evidently), observability (Prometheus · Grafana), CI/CD (GitHub Actions), and automated deployment (Ansible).
 
-An end-to-end robotics ML project: trains a manipulation policy using Behavioural Cloning and Diffusion Policy, then deploys it as a production-grade service with FastAPI, Docker, Kubernetes, and Prometheus/Grafana monitoring — demonstrating the full MLOps lifecycle from training to live observability.
+Trains a manipulation policy using Behavioural Cloning and Diffusion Policy, then wraps it in a production-grade shared platform that demonstrates the full ML lifecycle from training to live monitoring.
 
 ---
 
 ## ✨ What this demonstrates
 
-- **Two policy architectures** — Behavioural Cloning (BC) and Diffusion Policy, trained and compared
-- **Full MLOps stack** — the same model that trained locally ships to Kubernetes
-- **Observability** — Prometheus metrics + Grafana dashboard for inference latency, throughput, error rate
-- **CI/CD** — GitHub Actions pipeline: lint → test → build Docker image → push → deploy
+| Capability | Technology |
+|---|---|
+| Policy training (BC + Diffusion) | PyTorch |
+| **Experiment tracking + model registry** | **MLflow** |
+| **GPU inference optimisation** | **FP16 · torch.compile · ONNX Runtime** |
+| **Data drift monitoring** | **Evidently AI** |
+| REST serving | FastAPI |
+| Containerisation | Docker |
+| Orchestration + auto-scaling | Kubernetes · HPA |
+| Observability | Prometheus · Grafana |
+| CI/CD | GitHub Actions |
+| **Automated deployment** | **Ansible** |
 
 ---
 
-## 🏗️ Architecture
+## 🏗 Platform architecture
 
 ```
 Training
-  └── BC Policy / Diffusion Policy (PyTorch)
-        └── Saved checkpoint
+└── BC Policy / Diffusion Policy (PyTorch)
+    └── MLflow experiment tracking
+        └── Model Registry (Staging → Production)
 
 Serving
-  └── FastAPI inference server
-        └── Docker image
-              └── Kubernetes Deployment
-                    ├── HPA (auto-scaling)
-                    └── Service (LoadBalancer)
+└── FastAPI inference server
+    └── Docker image → Kubernetes Deployment
+        ├── HPA (auto-scaling)
+        └── Service (LoadBalancer)
 
 Monitoring
-  └── Prometheus (metrics scrape)
-        └── Grafana (dashboard)
+├── Prometheus (metrics scrape)
+├── Grafana (latency · throughput · error-rate dashboard)
+└── Evidently (data drift detection → CI gate)
+
+Deployment
+└── Ansible playbook (Ubuntu 22.04 → full stack in one command)
 ```
 
 ---
 
 ## 🚀 Quick start
 
-**Local training:**
+### 1. Train + track with MLflow
 ```bash
-git clone https://github.com/Nawfal-AI/manipulation-policy-pipeline
-cd manipulation-policy-pipeline
 pip install -r requirements.txt
-python train.py --policy bc --config configs/bc.yaml
+python generate_demos.py
+python mlflow/mlflow_tracking.py --policy bc --data data/demos.npz
+mlflow ui --port 5000
 ```
 
-**Docker:**
+### 2. Promote best model to Production
 ```bash
-docker build -t manipulation-policy .
-docker run -p 8000:8000 manipulation-policy
+python mlflow/model_registry.py best
+python mlflow/model_registry.py list
 ```
 
-**Kubernetes:**
+### 3. Run GPU inference benchmark
+```bash
+python benchmarks/inference_benchmark.py --checkpoint checkpoints/bc_policy.pt
+```
+See [benchmarks/results.md](benchmarks/results.md) for FP16 / ONNX speedup numbers.
+
+### 4. Run drift monitoring
+```bash
+python monitoring/drift/drift_monitor.py \
+  --reference data/demos.npz \
+  --production data/demos.npz \
+  --output monitoring/drift/drift_report.html
+```
+
+### 5. Serve with Docker Compose (all services)
+```bash
+docker compose up --build
+```
+
+| Service | URL |
+|---|---|
+| Policy API | http://localhost:8000/docs |
+| MLflow UI | http://localhost:5000 |
+| Prometheus | http://localhost:9090 |
+| Grafana | http://localhost:3000 |
+
+### 6. Deploy to any Ubuntu server via Ansible
+```bash
+pip install ansible
+ansible-galaxy collection install community.docker
+ansible-playbook ansible/playbook.yml -i ansible/inventory.ini
+```
+See [ansible/README.md](ansible/README.md) for local Docker test instructions.
+
+### 7. Kubernetes
 ```bash
 kubectl apply -f k8s/
-# Grafana dashboard: kubectl port-forward svc/grafana 3000:3000
+kubectl port-forward svc/grafana 3000:3000
 ```
 
 ---
 
-## 🔧 Stack
-
-| Component | Technology |
-|---|---|
-| Policy training | PyTorch · NumPy |
-| Serving | FastAPI |
-| Containerisation | Docker |
-| Orchestration | Kubernetes · Helm |
-| Monitoring | Prometheus · Grafana |
-| CI/CD | GitHub Actions |
-
----
-
-## 📂 Structure
+## 🔧 Full stack
 
 ```
 manipulation-policy-pipeline/
-├── train.py
-├── policies/
-│   ├── bc_policy.py
-│   └── diffusion_policy.py
-├── serve/
-│   └── main.py               # FastAPI app
-├── k8s/
-│   ├── deployment.yaml
-│   ├── service.yaml
-│   └── hpa.yaml
+├── train_policy.py
+├── models.py
+├── serve.py
+├── evaluate_policy.py
+├── generate_demos.py
+├── mlflow/
+│   ├── mlflow_tracking.py       ← NEW: train + log to MLflow
+│   └── model_registry.py        ← NEW: promote Staging → Production
+├── benchmarks/
+│   ├── inference_benchmark.py   ← NEW: FP16 / ONNX / torch.compile
+│   └── results.md               ← NEW: benchmark results table
 ├── monitoring/
 │   ├── prometheus.yml
-│   └── grafana_dashboard.json
+│   ├── grafana_dashboard.json
+│   └── drift/
+│       └── drift_monitor.py     ← NEW: Evidently drift report + CI gate
+├── ansible/
+│   ├── playbook.yml             ← NEW: full-stack deployment
+│   ├── inventory.ini
+│   ├── inventory_local.ini
+│   └── README.md
+├── k8s/
 ├── .github/workflows/ci.yml
+├── docker-compose.yml           ← UPDATED: added MLflow service
+├── requirements.txt             ← UPDATED: mlflow, evidently, onnx
 └── Dockerfile
 ```
 
 ---
 
 ## 📄 License
-
 MIT
