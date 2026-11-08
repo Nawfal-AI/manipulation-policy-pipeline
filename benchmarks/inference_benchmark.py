@@ -96,15 +96,17 @@ def benchmark_onnx(model, batch, device, export_path="benchmarks/policy.onnx"):
     except ImportError:
         return {"mode": "onnx", "note": "onnx/onnxruntime not installed — pip install onnx onnxruntime"}
 
-    # Export
-    dummy = torch.randn(1, 8)
+    # Export — model and dummy must both be on CPU for ONNX export
+    model_cpu = model.cpu()
+    dummy = torch.randn(1, 8)  # CPU tensor
     torch.onnx.export(
-        model, dummy, export_path,
+        model_cpu, dummy, export_path,
         input_names=["observation"],
         output_names=["action"],
         dynamic_axes={"observation": {0: "batch_size"}, "action": {0: "batch_size"}},
         opset_version=17,
     )
+    model.to(device)  # move back to GPU after export
     print(f"  ONNX model exported → {export_path}  ({os.path.getsize(export_path)/1024:.1f} KB)")
 
     # Benchmark

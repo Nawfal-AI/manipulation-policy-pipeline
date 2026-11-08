@@ -1,78 +1,84 @@
 {
-  "device": "cpu",
+  "device": "cuda",
   "benchmarks": {
     "1": [
       {
         "mode": "baseline_fp32",
-        "p50_ms": 0.01333397813141346,
-        "p95_ms": 0.013666987069882452,
-        "throughput_per_sec": 76499
+        "p50_ms": 0.13431449997369782,
+        "p95_ms": 0.1670614499516887,
+        "throughput_per_sec": 7111
       },
       {
         "mode": "fp16",
-        "note": "FP16 not supported on CPU \u2014 skipped"
+        "p50_ms": 0.12922849998631136,
+        "p95_ms": 0.1595365998923624,
+        "throughput_per_sec": 7290
       },
       {
         "mode": "torch.compile",
-        "p50_ms": 0.022270483896136284,
-        "p95_ms": 0.023712182883173227,
-        "throughput_per_sec": 44857
+        "p50_ms": 0.16658350011766743,
+        "p95_ms": 0.23524929993072874,
+        "throughput_per_sec": 5724
       },
       {
         "mode": "onnx_runtime",
-        "p50_ms": 0.004415982402861118,
-        "p95_ms": 0.00474998087156564,
-        "throughput_per_sec": 225406,
+        "p50_ms": 0.012300000094001007,
+        "p95_ms": 0.013465299866766126,
+        "throughput_per_sec": 76953,
         "model_size_kb": 1
       }
     ],
     "32": [
       {
         "mode": "baseline_fp32",
-        "p50_ms": 0.022124993847683072,
-        "p95_ms": 0.02291904529556632,
-        "throughput_per_sec": 1449878
+        "p50_ms": 0.14070650013309205,
+        "p95_ms": 0.1840271999867575,
+        "throughput_per_sec": 212509
       },
       {
         "mode": "fp16",
-        "note": "FP16 not supported on CPU \u2014 skipped"
+        "p50_ms": 0.1505609999412627,
+        "p95_ms": 0.3124447000800498,
+        "throughput_per_sec": 191139
       },
       {
         "mode": "torch.compile",
-        "p50_ms": 0.10322898742742836,
-        "p95_ms": 0.12299022055231033,
-        "throughput_per_sec": 305996
+        "p50_ms": 0.18622150003011484,
+        "p95_ms": 0.22645755000212373,
+        "throughput_per_sec": 167322
       },
       {
         "mode": "onnx_runtime",
-        "p50_ms": 0.010167015716433525,
-        "p95_ms": 0.010544041288085282,
-        "throughput_per_sec": 3134502,
+        "p50_ms": 0.028256500058887468,
+        "p95_ms": 0.04037420012537041,
+        "throughput_per_sec": 1060290,
         "model_size_kb": 1
       }
     ],
     "256": [
       {
         "mode": "baseline_fp32",
-        "p50_ms": 0.05524995503947139,
-        "p95_ms": 0.06275620544329286,
-        "throughput_per_sec": 4544380
+        "p50_ms": 0.14968699997552903,
+        "p95_ms": 0.1838530498844191,
+        "throughput_per_sec": 1662028
       },
       {
         "mode": "fp16",
-        "note": "FP16 not supported on CPU \u2014 skipped"
+        "p50_ms": 0.14410699998279597,
+        "p95_ms": 0.2153968998982231,
+        "throughput_per_sec": 1641356
       },
       {
         "mode": "torch.compile",
-        "p50_ms": 0.11662498582154512,
-        "p95_ms": 0.1384913339279592,
-        "throughput_per_sec": 2162801
+        "p50_ms": 0.1899034999723881,
+        "p95_ms": 0.23609425008999077,
+        "throughput_per_sec": 1298363
       },
       {
         "mode": "onnx_runtime",
-        "p50_ms": 0.036416982766240835,
-        "p95_ms": 0.03862708108499646,
-        "throughput_per_sec": 6989254,
+        "p50_ms": 0.11933500002214714,
+        "p95_ms": 0.2117668500545733,
+        "throughput_per_sec": 1882885,
         "model_size_kb": 1
       }
     ]

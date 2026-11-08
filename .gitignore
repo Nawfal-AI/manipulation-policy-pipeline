@@ -4,3 +4,12 @@ data/
 .DS_Store
 .env
 venv/
+
+# MLflow run artifacts
+mlruns/
+mlflow.db
+
+# Evidently HTML reports
+monitoring/drift/drift_report.html
+monitoring/drift/drift_report_summary.json
+benchmarks/policy.onnx
