@@ -46,7 +46,31 @@ Deployment
 └── Ansible playbook (Ubuntu 22.04 → full stack in one command)
 ```
 
+
 ---
+
+
+## 📸 Screenshots
+
+### MLflow Experiment Tracking
+![MLflow Experiments](docs/screenshots/mlflow_experiments.png)
+
+### MLflow Run — Loss Curve & Parameters
+![MLflow Run](docs/screenshots/mlflow_run_overview.png)
+
+### MLflow Loss Curve
+![Loss Curve](docs/screenshots/mlflow_loss_curve.png)
+
+### Model Registry — Version 1 Registered
+![Model Registry](docs/screenshots/mlflow_registry_version.png)
+
+### Data Drift Report (Evidently)
+![Drift Report](docs/screenshots/drift_report.png)
+
+
+
+---
+
 
 ## 🚀 Quick start
 

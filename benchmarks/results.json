@@ -1,0 +1,80 @@
+{
+  "device": "cpu",
+  "benchmarks": {
+    "1": [
+      {
+        "mode": "baseline_fp32",
+        "p50_ms": 0.01333397813141346,
+        "p95_ms": 0.013666987069882452,
+        "throughput_per_sec": 76499
+      },
+      {
+        "mode": "fp16",
+        "note": "FP16 not supported on CPU \u2014 skipped"
+      },
+      {
+        "mode": "torch.compile",
+        "p50_ms": 0.022270483896136284,
+        "p95_ms": 0.023712182883173227,
+        "throughput_per_sec": 44857
+      },
+      {
+        "mode": "onnx_runtime",
+        "p50_ms": 0.004415982402861118,
+        "p95_ms": 0.00474998087156564,
+        "throughput_per_sec": 225406,
+        "model_size_kb": 1
+      }
+    ],
+    "32": [
+      {
+        "mode": "baseline_fp32",
+        "p50_ms": 0.022124993847683072,
+        "p95_ms": 0.02291904529556632,
+        "throughput_per_sec": 1449878
+      },
+      {
+        "mode": "fp16",
+        "note": "FP16 not supported on CPU \u2014 skipped"
+      },
+      {
+        "mode": "torch.compile",
+        "p50_ms": 0.10322898742742836,
+        "p95_ms": 0.12299022055231033,
+        "throughput_per_sec": 305996
+      },
+      {
+        "mode": "onnx_runtime",
+        "p50_ms": 0.010167015716433525,
+        "p95_ms": 0.010544041288085282,
+        "throughput_per_sec": 3134502,
+        "model_size_kb": 1
+      }
+    ],
+    "256": [
+      {
+        "mode": "baseline_fp32",
+        "p50_ms": 0.05524995503947139,
+        "p95_ms": 0.06275620544329286,
+        "throughput_per_sec": 4544380
+      },
+      {
+        "mode": "fp16",
+        "note": "FP16 not supported on CPU \u2014 skipped"
+      },
+      {
+        "mode": "torch.compile",
+        "p50_ms": 0.11662498582154512,
+        "p95_ms": 0.1384913339279592,
+        "throughput_per_sec": 2162801
+      },
+      {
+        "mode": "onnx_runtime",
+        "p50_ms": 0.036416982766240835,
+        "p95_ms": 0.03862708108499646,
+        "throughput_per_sec": 6989254,
+        "model_size_kb": 1
+      }
+    ]
+  }
+}

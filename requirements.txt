@@ -8,10 +8,11 @@ requests>=2.31.0
 pytest>=8.0.0
 # MLflow — experiment tracking + model registry
 mlflow>=2.13.0
-# Evidently — data drift monitoring
-evidently>=0.4.30
-# ONNX — inference optimization (Project 1)
+# Evidently — data drift monitoring (pin to 0.4.x — 0.7.x has breaking API changes)
+evidently==0.4.30
+# pandas pinned for evidently compatibility
+pandas>=2.0.0,<3.0.0
+# ONNX — inference optimization
 onnx>=1.16.0
 onnxruntime>=1.18.0
-# Pandas required by Evidently
-pandas>=2.0.0
+onnxscript

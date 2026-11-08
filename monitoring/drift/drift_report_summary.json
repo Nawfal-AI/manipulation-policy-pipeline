@@ -1,0 +1,7 @@
+{
+  "num_drifted": 2,
+  "total_features": 8,
+  "share_drifted": 0.25,
+  "drift_detected": false,
+  "threshold": 0.5
+}
