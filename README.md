@@ -156,6 +156,7 @@ manipulation-policy-pipeline/
 │   ├── inventory_local.ini
 │   └── README.md
 ├── k8s/
+│   └── helm/manipulation-policy/  ← Helm chart: multi-team isolated deployment
 ├── .github/workflows/ci.yml
 ├── docker-compose.yml           ← UPDATED: added MLflow service
 ├── requirements.txt             ← UPDATED: mlflow, evidently, onnx
