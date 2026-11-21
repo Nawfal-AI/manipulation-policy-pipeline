@@ -1,0 +1,10 @@
+apiVersion: v2
+name: manipulation-policy
+description: >
+  Helm chart for the manipulation-policy inference server.
+  Packages FastAPI serving, Prometheus metrics, health/readiness probes,
+  HPA auto-scaling, and resource limits into a single installable unit
+  that any team can deploy into their own namespace with one command.
+type: application
+version: 0.1.0
+appVersion: "1.0.0"

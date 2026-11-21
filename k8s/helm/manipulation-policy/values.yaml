@@ -1,0 +1,63 @@
+# Default values — override with --set or a team-specific values file.
+# Example (team override):
+#   helm install atlas-policy ./k8s/helm/manipulation-policy \
+#     --namespace atlas-team \
+#     --values k8s/helm/atlas-values.yaml
+
+replicaCount: 2
+
+image:
+  repository: ghcr.io/nawfal-ai/manipulation-policy-pipeline/policy-server
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8000
+
+resources:
+  requests:
+    cpu: "250m"
+    memory: "512Mi"
+  limits:
+    cpu: "1"
+    memory: "1Gi"
+  # GPU: uncomment to request a GPU slice on nodes with nvidia.com/gpu allocatable
+  # gpu:
+  #   limits:
+  #     nvidia.com/gpu: "1"
+
+autoscaling:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 70
+
+checkpoint:
+  # Path inside the container where the model checkpoint is expected.
+  # In production, mount this from a PersistentVolumeClaim or an initContainer
+  # that pulls from object storage. For local minikube/k3d testing, a hostPath
+  # volume works (see deployment.yaml volumeMounts comments).
+  path: /app/checkpoints/bc_policy.pt
+
+probes:
+  readiness:
+    path: /health
+    initialDelaySeconds: 5
+    periodSeconds: 10
+  liveness:
+    path: /health
+    initialDelaySeconds: 15
+    periodSeconds: 20
+
+metrics:
+  # Set to true to add the prometheus.io/scrape annotation so the platform
+  # Prometheus picks this pod up via Kubernetes service discovery automatically.
+  enabled: true
+  path: /metrics
+  port: 8000
+
+priorityClassName: ""
+# Set to "inference-high" on a cluster with priority classes configured
+# (see PLATFORM_DESIGN.md) to protect live serving from pre-emption.
